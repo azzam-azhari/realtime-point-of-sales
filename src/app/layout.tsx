@@ -25,7 +25,7 @@ export default async function RootLayout({
   const profile = JSON.parse(cookiesStore.get('user_profile')?.value ?? '{}');
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`} suppressHydrationWarning>
         <ReactQueryProvider>
           <AuthStoreProvider profile={profile}>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
