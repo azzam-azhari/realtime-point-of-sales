@@ -1,0 +1,49 @@
+midtrans akun azzamazhari.dev@gmail.com
+
+1. .env.local
+NEXT_PUBLIC_MIDTRANS_API_URL=https://api.sandbox.midtrans.com/
+NEXT_PUBLIC_MIDTRANS_CLIENT_KEY=Mid
+MIDTRANS_SERVER_KEY=Mid
+
+2. pada environment.ts
+tambah
+MIDTRANS_API_URL: process.env.NEXT_PUBLIC_MIDTRANS_API_URL || '', 
+MIDTRANS_CLIENT_KEY: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || ''
+MIDTRANS_SERVER_KEY: process.env.MIDTRANS_SERVER_KEY || '',
+
+3. tambah di page.tsx
+<div className="w-full">
+      <Script src={`${environment.MIDTRANS_API_URL}/snap/snap.js`} data-client-key={environment.MIDTRANS_CLIENT_KEY} strategy="lazyOnload" />
+      <DetailOrder id={id} />
+    </div>
+
+4. Pada midtrans dashboard /snap preferences
+tambah url /success dan /failed
+
+5. error di actions.ts
+ubah ke:
+ const parameter = {
+    // Saran gemini
+    transaction_details: {
+      order_id: `${orderId}-${Date.now()}`, // Bagian ini yang mencegah duplikat
+      gross_amount: Math.round(Number(grossAmount)),
+    },
+    customer_details: {
+      first_name: customerName as string,
+    },
+  };
+
+  dari sebelumnya:
+  const parameter = {
+    transaction_details: {
+      order_id: `${orderId}`,
+      gross_amount: parseFloat(grossAmount as string),
+    },
+    customer_details: {
+      first_name: customerName,
+    },
+  };
+
+
+
+

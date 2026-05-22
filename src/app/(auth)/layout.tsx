@@ -12,15 +12,7 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="absolute top-4 right-4">
         <DarkmodeToggle />
       </div>
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <div className="flex items-center gap-2 self-center font-medium">
-          <div className="bg-teal-500 flex p-2 items-center justify-center rounded-md">
-            <Coffee className="size-4" />
-          </div>
-          WPU Cafe
-        </div>
-        {children}
-      </div>
+      <div className="flex w-full max-w-sm flex-col gap-6">{children}</div>
     </div>
   );
 }
