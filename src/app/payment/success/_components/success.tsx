@@ -19,7 +19,7 @@ export default function Success() {
       const { data } = await supabase
         .from('orders')
         .update({
-          status: 'settled',
+          status: 'settlement',
         })
         .eq('order_id', order_id)
         .select()
@@ -41,7 +41,7 @@ export default function Success() {
   }, [order_id]);
 
   return (
-    <div className="w-full flex flex-col justify-center items-center gap-4">
+    <div className="w-full min-h-screen flex flex-col justify-center items-center gap-4">
       <CheckCircle className="size-15 text-green-400" />
       <h1 className="text-2xl font-bold">Payment Success</h1>
       <Link href="/order">

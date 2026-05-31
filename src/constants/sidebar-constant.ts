@@ -1,4 +1,10 @@
-import { Album, Armchair, LayoutDashboard, SquareMenu, Users } from 'lucide-react';
+import {
+  Album,
+  Armchair,
+  LayoutDashboard,
+  SquareMenu,
+  Users,
+} from 'lucide-react';
 
 export const SIDEBAR_MENU_LIST = {
   admin: [

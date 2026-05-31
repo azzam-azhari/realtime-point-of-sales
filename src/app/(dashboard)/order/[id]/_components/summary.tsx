@@ -23,7 +23,10 @@ export default function Summary({
     tables: { name: string }[];
     status: string;
   };
-  orderMenu: { menus: Menu; quantity: number; status: string }[] | null | undefined;
+  orderMenu:
+  | { menus: Menu; quantity: number; status: string }[]
+  | null
+  | undefined;
   id: string;
 }) {
   const { grandTotal, totalPrice, tax, service } = usePricing(orderMenu);
@@ -32,7 +35,11 @@ export default function Summary({
     return orderMenu?.every((item) => item.status === 'served');
   }, [orderMenu]);
 
-  const [generatePaymentState, generatePaymentAction, isPendingGeneratePayment] = useActionState(generatePayment, INITIAL_STATE_GENERATE_PAYMENT);
+  const [
+    generatePaymentState,
+    generatePaymentAction,
+    isPendingGeneratePayment,
+  ] = useActionState(generatePayment, INITIAL_STATE_GENERATE_PAYMENT);
 
   const handleGeneratePayment = () => {
     const formData = new FormData();
@@ -67,7 +74,10 @@ export default function Summary({
             </div>
             <div className="space-y-2">
               <Label>Table</Label>
-              <Input value={(order?.tables as unknown as { name: string })?.name} disabled />
+              <Input
+                value={(order?.tables as unknown as { name: string })?.name}
+                disabled
+              />
             </div>
           </div>
         )}
@@ -92,8 +102,17 @@ export default function Summary({
             <p className="text-lg font-semibold">{convertIDR(grandTotal)}</p>
           </div>
           {order?.status === 'process' && profile.role !== 'kitchen' && (
-            <Button type="submit" onClick={handleGeneratePayment} disabled={!isAllServed || isPendingGeneratePayment} className="w-full font-semibold bg-teal-500 hover:bg-teal-600 text-white cursor-pointer">
-              {isPendingGeneratePayment ? <Loader2 className="animate-spin" /> : 'Pay'}
+            <Button
+              type="submit"
+              onClick={handleGeneratePayment}
+              disabled={!isAllServed || isPendingGeneratePayment}
+              className="w-full font-semibold bg-teal-500 hover:bg-teal-600 text-white cursor-pointer"
+            >
+              {isPendingGeneratePayment ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                'Pay'
+              )}
             </Button>
           )}
         </div>

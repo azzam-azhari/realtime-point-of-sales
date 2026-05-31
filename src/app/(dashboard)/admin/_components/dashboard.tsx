@@ -1,7 +1,12 @@
 'use client';
 
 import LineCharts from '@/components/common/line-chart';
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
 import { createClient } from '@/lib/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 
@@ -18,7 +23,11 @@ export default function Dashboard() {
   } = useQuery({
     queryKey: ['orders-per-day'],
     queryFn: async () => {
-      const { data } = await supabase.from('orders').select('created_at').gte('created_at', lastWeek.toISOString()).order('created_at');
+      const { data } = await supabase
+        .from('orders')
+        .select('created_at')
+        .gte('created_at', lastWeek.toISOString())
+        .order('created_at');
 
       const counts: Record<string, number> = {};
 
@@ -38,9 +47,9 @@ export default function Dashboard() {
       <Card>
         <CardHeader>
           <CardTitle>Order Create Per Week</CardTitle>
-          {/* Edit from gemini  */}
           <CardDescription>
-            Showing orders from {lastWeek.toISOString().slice(0, 10)} to {new Date().toISOString().slice(0, 10)}
+            Showing orders from {lastWeek.toLocaleDateString()} to{' '}
+            {new Date().toLocaleDateString()}
           </CardDescription>
         </CardHeader>
         <div className="w-full h-64 p-6">

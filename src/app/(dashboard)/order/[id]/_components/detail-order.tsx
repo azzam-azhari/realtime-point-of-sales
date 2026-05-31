@@ -12,7 +12,12 @@ import Link from 'next/link';
 import { startTransition, useActionState, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 import Summary from './summary';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { EllipsisVertical } from 'lucide-react';
 import { updateStatusOrderitem } from '../../actions';
 import { INITIAL_STATE_ACTION } from '@/constants/general-constant';
@@ -20,13 +25,18 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export default function DetailOrder({ id }: { id: string }) {
   const supabase = createClientSupabase();
-  const { currentPage, currentLimit, handleChangePage, handleChangeLimit } = useDataTable();
+  const { currentPage, currentLimit, handleChangePage, handleChangeLimit } =
+    useDataTable();
   const profile = useAuthStore((state) => state.profile);
 
   const { data: order } = useQuery({
     queryKey: ['order', id],
     queryFn: async () => {
-      const result = await supabase.from('orders').select('id, customer_name, status, payment_token, tables (name, id)').eq('order_id', id).single();
+      const result = await supabase
+        .from('orders')
+        .select('id, customer_name, status, payment_token, tables (name, id)')
+        .eq('order_id', id)
+        .single();
 
       if (result.error)
         toast.error('Get Order data failed', {
@@ -69,7 +79,11 @@ export default function DetailOrder({ id }: { id: string }) {
   } = useQuery({
     queryKey: ['orders_menu', order?.id, currentPage, currentLimit],
     queryFn: async () => {
-      const result = await supabase.from('orders_menus').select('*, menus (id, name, image_url, price)', { count: 'exact' }).eq('order_id', order?.id).order('status');
+      const result = await supabase
+        .from('orders_menus')
+        .select('*, menus (id, name, image_url, price)', { count: 'exact' })
+        .eq('order_id', order?.id)
+        .order('status');
 
       if (result.error)
         toast.error('Get order menu data failed', {
@@ -81,9 +95,15 @@ export default function DetailOrder({ id }: { id: string }) {
     enabled: !!order?.id,
   });
 
-  const [updateStatusOrderState, updateStatusOrderAction] = useActionState(updateStatusOrderitem, INITIAL_STATE_ACTION);
+  const [updateStatusOrderState, updateStatusOrderAction] = useActionState(
+    updateStatusOrderitem,
+    INITIAL_STATE_ACTION,
+  );
 
-  const handleUpdateStatusOrder = async (data: { id: string; status: string }) => {
+  const handleUpdateStatusOrder = async (data: {
+    id: string;
+    status: string;
+  }) => {
     const formData = new FormData();
     Object.entries(data).forEach(([Key, value]) => {
       formData.append(Key, value);
@@ -111,10 +131,18 @@ export default function DetailOrder({ id }: { id: string }) {
       return [
         currentLimit * (currentPage - 1) + index + 1,
         <div className="flex items-center gap-2">
-          <Image src={item.menus.image_url} alt={item.menus.name} width={40} height={40} className="rounded" />
+          <Image
+            src={item.menus.image_url}
+            alt={item.menus.name}
+            width={40}
+            height={40}
+            className="rounded"
+          />
           <div className="flex flex-col">
             {item.menus.name} x {item.quantity}
-            <span className="text-xs text-muted-foreground">{item.notes || 'No Notes'}</span>
+            <span className="text-xs text-muted-foreground">
+              {item.notes || 'No Notes'}
+            </span>
           </div>
         </div>,
         <div>{convertIDR(item.menus.price * item.quantity)}</div>,
@@ -130,7 +158,14 @@ export default function DetailOrder({ id }: { id: string }) {
         </div>,
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className={cn('data-[state=open]:bg-muted text-muted-foreground flex size-8', { hidden: item.status === 'served' })} size="icon">
+            <Button
+              variant="ghost"
+              className={cn(
+                'data-[state=open]:bg-muted text-muted-foreground flex size-8',
+                { hidden: item.status === 'served' },
+              )}
+              size="icon"
+            >
               <EllipsisVertical />
             </Button>
           </DropdownMenuTrigger>
@@ -161,7 +196,9 @@ export default function DetailOrder({ id }: { id: string }) {
   }, [orderMenu?.data]);
 
   const totalPages = useMemo(() => {
-    return orderMenu && orderMenu.count !== null ? Math.ceil(orderMenu.count / currentLimit) : 0;
+    return orderMenu && orderMenu.count !== null
+      ? Math.ceil(orderMenu.count / currentLimit)
+      : 0;
   }, [orderMenu]);
 
   return (
@@ -187,7 +224,11 @@ export default function DetailOrder({ id }: { id: string }) {
             onChangeLimit={handleChangeLimit}
           />
         </div>
-        <div className="lg:w-1/3">{order && <Summary order={order} orderMenu={orderMenu?.data} id={id} />}</div>
+        <div className="lg:w-1/3">
+          {order && (
+            <Summary order={order} orderMenu={orderMenu?.data} id={id} />
+          )}
+        </div>
       </div>
     </div>
   );

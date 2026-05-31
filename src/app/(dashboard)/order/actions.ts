@@ -8,7 +8,10 @@ import { redirect } from 'next/navigation';
 import midtrans from 'midtrans-client';
 import { environment } from '@/configs/environment';
 
-export async function createOrder(prevState: OrderFormState, formData: FormData) {
+export async function createOrder(
+  prevState: OrderFormState,
+  formData: FormData,
+) {
   const validatedFields = orderFormSchema.safeParse({
     customer_name: formData.get('customer_name'),
     table_id: formData.get('table_id'),
@@ -39,7 +42,10 @@ export async function createOrder(prevState: OrderFormState, formData: FormData)
     supabase
       .from('tables')
       .update({
-        status: validatedFields.data.status === 'reserved' ? 'reserved' : 'unavailable',
+        status:
+          validatedFields.data.status === 'reserved'
+            ? 'reserved'
+            : 'unavailable',
       })
       .eq('id', validatedFields.data.table_id),
   ]);
@@ -52,7 +58,10 @@ export async function createOrder(prevState: OrderFormState, formData: FormData)
       status: 'error',
       errors: {
         ...prevState.errors,
-        _form: [...(orderError ? [orderError.message] : []), ...(tableError ? [tableError.message] : [])],
+        _form: [
+          ...(orderError ? [orderError.message] : []),
+          ...(tableError ? [tableError.message] : []),
+        ],
       },
     };
   }
@@ -62,7 +71,10 @@ export async function createOrder(prevState: OrderFormState, formData: FormData)
   };
 }
 
-export async function updateReservation(prevState: FormState, formData: FormData) {
+export async function updateReservation(
+  prevState: FormState,
+  formData: FormData,
+) {
   const supabase = await createClient();
 
   const [orderResult, tableResult] = await Promise.all([
@@ -75,7 +87,8 @@ export async function updateReservation(prevState: FormState, formData: FormData
     supabase
       .from('tables')
       .update({
-        status: formData.get('status') === 'process' ? 'unavailable' : 'available',
+        status:
+          formData.get('status') === 'process' ? 'unavailable' : 'available',
       })
       .eq('id', formData.get('table_id')),
   ]);
@@ -88,7 +101,10 @@ export async function updateReservation(prevState: FormState, formData: FormData
       status: 'error',
       errors: {
         ...prevState.errors,
-        _form: [...(orderError ? [orderError.message] : []), ...(tableError ? [tableError.message] : [])],
+        _form: [
+          ...(orderError ? [orderError.message] : []),
+          ...(tableError ? [tableError.message] : []),
+        ],
       },
     };
   }
@@ -123,7 +139,10 @@ export async function addOrderItem(
   redirect(`/order/${data.order_id}`);
 }
 
-export async function updateStatusOrderitem(prevState: FormState, formData: FormData) {
+export async function updateStatusOrderitem(
+  prevState: FormState,
+  formData: FormData,
+) {
   const supabase = await createClient();
 
   const { error } = await supabase
@@ -148,7 +167,10 @@ export async function updateStatusOrderitem(prevState: FormState, formData: Form
   };
 }
 
-export async function generatePayment(prevState: FormState, formData: FormData) {
+export async function generatePayment(
+  prevState: FormState,
+  formData: FormData,
+) {
   const supabase = await createClient();
   const orderId = formData.get('id');
   const grossAmount = formData.get('gross_amount');
@@ -159,13 +181,12 @@ export async function generatePayment(prevState: FormState, formData: FormData) 
     serverKey: environment.MIDTRANS_SERVER_KEY!,
   });
   const parameter = {
-    // Saran gemini
     transaction_details: {
-      order_id: `${orderId}-${Date.now()}`, // Bagian ini yang mencegah duplikat
-      gross_amount: Math.round(Number(grossAmount)),
+      order_id: `${orderId}`,
+      gross_amount: parseFloat(grossAmount as string),
     },
     customer_details: {
-      first_name: customerName as string,
+      first_name: customerName,
     },
   };
 
@@ -184,7 +205,10 @@ export async function generatePayment(prevState: FormState, formData: FormData) 
     };
   }
 
-  await supabase.from('orders').update({ payment_token: result.token }).eq('order_id', orderId);
+  await supabase
+    .from('orders')
+    .update({ payment_token: result.token })
+    .eq('order_id', orderId);
 
   return {
     status: 'success',

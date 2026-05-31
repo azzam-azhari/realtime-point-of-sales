@@ -9,7 +9,13 @@ import useDataTable from '@/hooks/use-data-table';
 import { createClientSupabase } from '@/lib/supabase/default';
 import { useQuery } from '@tanstack/react-query';
 import { Ban, Link2Icon, Pencil, ScrollText, Trash2 } from 'lucide-react';
-import { startTransition, useActionState, useEffect, useMemo, useState } from 'react';
+import {
+  startTransition,
+  useActionState,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { Table } from '@/validations/table-validation';
@@ -22,7 +28,14 @@ import { useAuthStore } from '@/stores/auth-store';
 
 export default function OrderManagement() {
   const supabase = createClientSupabase();
-  const { currentPage, currentLimit, currentSearch, handleChangePage, handleChangeLimit, handleChangeSearch } = useDataTable();
+  const {
+    currentPage,
+    currentLimit,
+    currentSearch,
+    handleChangePage,
+    handleChangeLimit,
+    handleChangeSearch,
+  } = useDataTable();
   const profile = useAuthStore((state) => state.profile);
 
   const {
@@ -44,7 +57,9 @@ export default function OrderManagement() {
         .order('created_at');
 
       if (currentSearch) {
-        query.or(`order_id.ilike.%${currentSearch}%,customer_name.ilike.%${currentSearch}%`);
+        query.or(
+          `order_id.ilike.%${currentSearch}%,customer_name.ilike.%${currentSearch}%`,
+        );
       }
 
       const result = await query;
@@ -61,7 +76,11 @@ export default function OrderManagement() {
   const { data: tables, refetch: refetchTables } = useQuery({
     queryKey: ['tables'],
     queryFn: async () => {
-      const result = await supabase.from('tables').select('*').order('created_at').order('status');
+      const result = await supabase
+        .from('tables')
+        .select('*')
+        .order('created_at')
+        .order('status');
 
       return result.data;
     },
@@ -99,12 +118,25 @@ export default function OrderManagement() {
   };
 
   const totalPages = useMemo(() => {
-    return orders && orders.count !== null ? Math.ceil(orders.count / currentLimit) : 0;
+    return orders && orders.count !== null
+      ? Math.ceil(orders.count / currentLimit)
+      : 0;
   }, [orders]);
 
-  const [reservedState, reservedAction] = useActionState(updateReservation, INITIAL_STATE_ACTION);
+  const [reservedState, reservedAction] = useActionState(
+    updateReservation,
+    INITIAL_STATE_ACTION,
+  );
 
-  const handleReservation = async ({ id, table_id, status }: { id: string; table_id: string; status: string }) => {
+  const handleReservation = async ({
+    id,
+    table_id,
+    status,
+  }: {
+    id: string;
+    table_id: string;
+    status: string;
+  }) => {
     const formData = new FormData();
     Object.entries({ id, table_id, status }).forEach(([Key, value]) => {
       formData.append(Key, value);
@@ -161,7 +193,7 @@ export default function OrderManagement() {
         (order.tables as unknown as { name: string }).name,
         <div
           className={cn('px-2 py-1 rounded-full text-white w-fit capitalize', {
-            'bg-lime-600': order.status === 'settled',
+            'bg-lime-600': order.status === 'settlement',
             'bg-sky-600': order.status === 'process',
             'bg-amber-600': order.status === 'reserved',
             'bg-red-600': order.status === 'canceled',
@@ -173,20 +205,27 @@ export default function OrderManagement() {
           menu={
             order.status === 'reserved' && profile.role !== 'kitchen'
               ? reservedActionList.map((item) => ({
-                  label: item.label,
-                  action: () => item.action(order.id, (order.tables as unknown as { id: string }).id),
-                }))
+                label: item.label,
+                action: () =>
+                  item.action(
+                    order.id,
+                    (order.tables as unknown as { id: string }).id,
+                  ),
+              }))
               : [
-                  {
-                    label: (
-                      <Link href={`/order/${order.order_id}`} className="flex items-center gap-2">
-                        <ScrollText />
-                        Detail
-                      </Link>
-                    ),
-                    type: 'link',
-                  },
-                ]
+                {
+                  label: (
+                    <Link
+                      href={`/order/${order.order_id}`}
+                      className="flex items-center gap-2"
+                    >
+                      <ScrollText />
+                      Detail
+                    </Link>
+                  ),
+                  type: 'link',
+                },
+              ]
           }
         />,
       ];
@@ -198,7 +237,10 @@ export default function OrderManagement() {
       <div className="flex flex-col lg:flex-row mb-4 gap-2 justify-between w-full">
         <h1 className="text-2xl font-bold">Order Management</h1>
         <div className="flex gap-2">
-          <Input placeholder="Search..." onChange={(e) => handleChangeSearch(e.target.value)} />
+          <Input
+            placeholder="Search..."
+            onChange={(e) => handleChangeSearch(e.target.value)}
+          />
           {profile.role !== 'kitchen' && (
             <Dialog>
               <DialogTrigger asChild>
@@ -209,7 +251,16 @@ export default function OrderManagement() {
           )}
         </div>
       </div>
-      <DataTable header={HEADER_TABLE_ORDER} data={filteredData} isLoading={isLoading} totalPages={totalPages} currentPage={currentPage} currentLimit={currentLimit} onChangePage={handleChangePage} onChangeLimit={handleChangeLimit} />
+      <DataTable
+        header={HEADER_TABLE_ORDER}
+        data={filteredData}
+        isLoading={isLoading}
+        totalPages={totalPages}
+        currentPage={currentPage}
+        currentLimit={currentLimit}
+        onChangePage={handleChangePage}
+        onChangeLimit={handleChangeLimit}
+      />
     </div>
   );
 }
